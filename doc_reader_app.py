@@ -12,23 +12,27 @@ from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_groq import ChatGroq
 import streamlit as st 
-import hashlib
+from sentence_transformers import SentenceTransformer
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
 
 
 
 load_dotenv()
 
 # OpenAI Key
-os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
+#os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
 
 #Groq
-os.environ['GROQ_API_KEY'] = os.getenv('GROQ_API_KEY')
+# os.environ['GROQ_API_KEY'] = os.getenv('GROQ_API_KEY')
 
 # LangChain Settings
-os.environ['LANGCHAIN_API_KEY'] = os.getenv('LANGCHAIN_API_KEY')
+os.environ['LANGCHAIN_API_KEY'] = "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"
 os.environ['LANGCHAIN_TRACING_V2'] = "true"
 os.environ['LANGCHAIN_PROJECT'] = "DOc_Reader"
-os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
+# os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
+
+GROQ_API_KEY =  "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"
 
 st.set_page_config(page_title="PDF QnA Chatbot")
 st.title("Chat with Your PDFs")
@@ -53,7 +57,9 @@ if upload_file:
         splitter = RecursiveCharacterTextSplitter(chunk_size=250,chunk_overlap=50)
         chunks = splitter.split_documents(documents=docs)
 
-        embeddings = OpenAIEmbeddings()
+        #embeddings = OpenAIEmbeddings()
+        #embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
         vectorstore = FAISS.from_texts([chunk.page_content for chunk in chunks],embedding=embeddings)
         vectorstore.save_local("faiss_index")
